@@ -1,21 +1,27 @@
 // static site genration => 'ssg' techniqe
 const getProjects = async() => {
-    const res =  await fetch("https://alhady21.runasp.net/api/Donations/GetAllSections", {
-        // this state in 'ssg' techniqe
-        cache: "force-cache",
-        // this state in 'isg' techniqe, 60s at build the page
-    });
 
-    if (!res) throw new Error("Failed to fetch data");
-    
+    try {
+         const res =  await fetch("https://alhady21.runasp.net/api/Donations/GetAllSections", {
+             // this state in 'ssg' techniqe
+             cache: "force-cache",
+            // next: {revalidate: 30}
+             // this state in 'isg' techniqe, 60s at build the page
+         });
 
-    const data =  await res.json()    
+         if (!res.ok){
+            console.warn("API returned an error:", res.status);
+             return []; // fallback data
+         }
+         const data =  await res.json()   
+         console.log(data);
 
-     console.log(data);
-     
-    // return data projects
-    return  data
-}
+         // return data projects
+         return  data
+    } catch (error) {
+       console.log(error);
+       return []
+    }}
 
 
 interface Project {
