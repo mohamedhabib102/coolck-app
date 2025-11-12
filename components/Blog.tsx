@@ -2,10 +2,10 @@
 const getProjects = async() => {
     const res =  await fetch("https://alhady21.runasp.net/api/Donations/GetAllSections", {
         // this state in 'ssg' techniqe
-        // cache: "force-cache" 
+        cache: "force-cache",
     
         // this state in 'isg' techniqe, 60s at build the page
-        next: {revalidate: 60}
+        // next: {revalidate: 60}
     });
 
     if (!res) throw new Error("Failed to fetch data");
