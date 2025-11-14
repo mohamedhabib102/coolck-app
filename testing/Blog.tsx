@@ -1,14 +1,16 @@
-// static site genration => 'ssg' techniqe
+// static site genration => ssg/ssr/isr techniqes
+interface Project {
+    sectionID: number;
+    name: string;
+}
 const getProjects = async() => {
-
     try {
-         const res =  await fetch("https://alhady21.runasp.net/api/Donations/GetAllSections", {
-             // this state in 'ssg' techniqe
-             cache: "force-cache",
-            // next: {revalidate: 30}
-             // this state in 'isg' techniqe, 60s at build the page
+         const res =  await fetch(
+            "https://example.runasp.net/api/Donations/GetAllSections", {
+             cache: "force-cache", // It runs on request in the case of ssg
+             // next: {revalidate: 30} // It runs on request in the case of ISR
+             //cache: "no-store", // It runs on request in the case of ssr
          });
-
          if (!res.ok){
             console.warn("API returned an error:", res.status);
              return []; // fallback data
@@ -21,25 +23,14 @@ const getProjects = async() => {
     } catch (error) {
        console.log(error);
        return []
-    }}
-
-
-interface Project {
-    sectionID: number;
-    name: string;
-}
-
+}}
 const Blog: React.FC  = async () => {
     const projects =  await getProjects();
-
     console.log(projects);
-    
     return (
         <div className="bg-[#EEE] p-4 rounded-lg">
             <h2 className="text-2xl text-blue-400 font-semibold mb-1">SSG Techniqe</h2>
-            <p className="text-black/70 leading-6 text-lg mb-5">Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, dicta. Nemo, cupiditate, labore vero molestiae non, eos repellendus culpa dolore aspernatur architecto molestias. Veniam quia soluta architecto recusandae ex atque.</p>
-            
-
+            <p className="text-black/70 leading-6 text-lg mb-5">Lorem ipsum dolor sit amet.</p>
             <div className="bg-white p-4 rounded-lg">
                 {projects.map((ele:Project) => (
                     <div key={ele.sectionID} className="mb-3">
@@ -50,6 +41,4 @@ const Blog: React.FC  = async () => {
         </div>
     )
 }
-
-
 export default Blog;
