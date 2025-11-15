@@ -12,9 +12,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "TimeMaster – Smart Timer",
   description: "Smart timer to track, pause, reset, and log sessions. Customizable design.",
-  icons: {
-    icon: "/logo-app.svg",         
-  },
   openGraph: {
     title: "TimeMaster – Smart Timer",
     description: "Smart timer to track, pause, reset, and log sessions. Customizable design.",
