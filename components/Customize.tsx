@@ -19,6 +19,14 @@ interface Actions {
 
 
 const Customize: React.FC<Actions> = ({ colors, setColors }) => {
+
+    const handelColor = (colors: Colors) => {
+      try {
+        localStorage.setItem("color", JSON.stringify(colors))
+      } catch (error) {
+        console.log(error);
+      }
+    }
   return (
     <section>
       <Swiper
@@ -39,11 +47,13 @@ const Customize: React.FC<Actions> = ({ colors, setColors }) => {
         <SwiperSlide>
           <div
           onClick={() => {
-            setColors({
+            const newColor = {
              firstBG: "#171717",
              lastBG: "#000",
              color: "#ffffff"
-            })
+            }
+            setColors(newColor)
+            handelColor(newColor)            
           }}
           className="lg:w-auto md:w-auto w-full pt-12 relative cursor-pointer
            bg-[#171717] p-7 rounded-lg text-white">
@@ -72,11 +82,13 @@ const Customize: React.FC<Actions> = ({ colors, setColors }) => {
         <SwiperSlide>
           <div
         onClick={() => {
-            setColors({
+            const newColor = {
              firstBG: "#0959b4",
              lastBG: "#eee",
              color: "#0959b4"
-            })
+            }
+            setColors(newColor)
+            handelColor(newColor)            
           }}
             className={`lg:w-auto md:w-auto w-full pt-12 relative cursor-pointer 
                 bg-[#0959b4] p-7 rounded-lg text-white`}
@@ -106,11 +118,14 @@ const Customize: React.FC<Actions> = ({ colors, setColors }) => {
         <SwiperSlide>
           <div 
         onClick={() => {
-            setColors({
+            const newColor = {
              firstBG: "#a65f00",
              lastBG: "#eee",
              color: "#a65f00"
-            })
+            }
+            setColors(newColor)
+            handelColor(newColor) 
+            
           }}
           className="lg:w-auto md:w-auto w-full pt-12 relative cursor-pointer 
           bg-[#a65f00] p-7 rounded-lg text-white">
@@ -139,11 +154,13 @@ const Customize: React.FC<Actions> = ({ colors, setColors }) => {
         <SwiperSlide>
           <div 
         onClick={() => {
-            setColors({
+            const newColor = {
              firstBG: "#312c85",
              lastBG: "#eee",
              color: "#312c85"
-            })
+            }
+            setColors(newColor)
+            handelColor(newColor)
           }}
           className="lg:w-auto md:w-auto w-full pt-12 relative cursor-pointer 
           bg-[#312c85] p-7 rounded-lg text-white">

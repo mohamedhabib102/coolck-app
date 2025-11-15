@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { CiPlay1, CiPause1 } from "react-icons/ci";
 import { IoReload } from "react-icons/io5";
-
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Pagination } from "swiper/modules";
 
 
 
@@ -20,6 +21,12 @@ interface Colors {
   color: string;
 }
 
+interface Goals {
+  name: string;
+  clock: Clock;
+  date: string;
+}
+
 const Clock: React.FC<Colors> = ({firstBG, lastBG, color}) => {
     const [toggle, setToggle] = useState<boolean>(false);
     const [clock, setClock] = useState<Clock>({
@@ -28,26 +35,26 @@ const Clock: React.FC<Colors> = ({firstBG, lastBG, color}) => {
       seconds: 0,
     });
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [typing, setTyping] = useState<boolean>(false);
+    const [inputText, setInputText] = useState<string>("Your Clock")
+    const [goals, setGoals] = useState<Goals[]>([])
 
 const tick = () => {
   setClock(prev => {
     let h = prev.hours;
     let m = prev.miuntes;
     let s = prev.seconds;
-    
 
     s +=1
-
     if (s === 60){
-      s = 0;
+      s = 1;
       m += 1
     }
 
     if (m === 60){
-      m=0;
+      m=1;
       h +=1
     }
-
     return { hours: h, miuntes: m, seconds: s };
   });
 };
@@ -56,6 +63,12 @@ const tick = () => {
      if (timerRef.current){
        clearInterval(timerRef.current)
        timerRef.current = null;
+       const savedClock = clock;
+       const currentClock = {
+        name: inputText,
+        savedClock,
+       }
+       localStorage.setItem("clock", JSON.stringify(currentClock));
        return;
      };
 
@@ -72,20 +85,80 @@ const tick = () => {
         miuntes: 0,
         seconds: 0,
       })
-    };
+    } else{
+
+    if (timerRef.current) clearInterval(timerRef.current)
+      timerRef.current = null
+      setClock({
+        hours: 0,
+        miuntes: 0,
+        seconds: 0,
+      })
+      localStorage.removeItem("clock")
+    }
+
+
+    const previousClock = { ...clock };
+
+    if (previousClock.seconds !== 0) {
+    
+      const currentClock:Goals = {
+        name: inputText,
+        clock: previousClock,
+        date: new Date().toDateString()
+      };
+    
+      const stored = localStorage.getItem("goals");
+      const existingGoals = stored ? JSON.parse(stored) : [];
+    
+      existingGoals.push(currentClock);
+    
+      localStorage.setItem("goals", JSON.stringify(existingGoals));
+    
+      setGoals((prev) => [...prev, currentClock]);
+    }
   }
      useEffect(() => {
-      console.log(firstBG, lastBG, color);
-      
-     }, [firstBG, lastBG, color])
+      const clockSave =  localStorage.getItem("clock");
+      const goals = localStorage.getItem("goals");
+
+      if (clockSave){
+        const clockLocal = JSON.parse(clockSave);
+        setClock(clockLocal.savedClock)
+      }
+
+      if (goals){
+        const goalsUser =  JSON.parse(goals);
+        setGoals(goalsUser)
+      }
+     }, [])
     return (
         <>
           <section className="lg:py-14 md:py-10 pt-0 pb-6"> 
-           <div
+      <div className="flex gap-2 flex-col  justify-center items-center mt-10 mb-10
+            ">
+
+       <div>
+          <div
              style={{ backgroundColor: firstBG }}
-             className="p-7 rounded-lg text-white mt-10 mb-10 lg:w-lg m-auto"
+             className="p-7 rounded-lg text-white lg:w-lg"
            >
-             <h2 className="text-center text-3xl mb-4">Your Clock</h2>
+             {typing ? (
+              <input 
+              type="text" 
+              name="inputText"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)} 
+              placeholder="type name goal"
+              onBlur={() => setTyping(!typing)}
+              className="border border-white py-2 px-3 rounded-lg w-full mb-4
+              outline-none placeholder:transition placeholder:duration-300 focus:placeholder:opacity-0"
+              />
+             ) : (
+              <h2 
+              onDoubleClick={() => setTyping(!typing)}
+              className="text-center text-3xl mb-4">{inputText || "Your Clock"}</h2>
+             )}
            
              <div className="flex items-center justify-center gap-4">
                <span
@@ -107,11 +180,11 @@ const tick = () => {
                  {clock.seconds.toString().padStart(2, "0")}
                </span>
              </div>
-           </div>
-           
-           
 
-            <div className="flex flex-row-reverse items-center lg:justify-between justify-around lg:w-lg m-auto w-full">
+             
+           </div>
+
+             <div className="mt-8 flex gap-1.5 flex-row-reverse items-center lg:justify-between justify-around lg:w-lg m-auto w-full">
             <button
             onClick={() => {
               setToggle(!toggle)
@@ -140,6 +213,54 @@ const tick = () => {
               />
             </button>
             </div>
+       </div>
+             
+             
+          <div className="w-full">
+            <h3 className={
+              `text-2xl text-gray-600 text-left rounded-lg p-2 font-bold mb-4
+            uppercase ${goals.length ? "block" : "hidden"}`
+            }>Goals</h3>
+            <div>
+           {goals.length > 0 && (
+             <Swiper
+              modules={[Pagination]}
+              pagination={{ clickable: true }}
+              spaceBetween={20}
+              slidesPerView={3}
+              breakpoints={{
+                  0: {
+                      slidesPerView: 1,
+                  }, 
+                  1024: {
+                      slidesPerView: 3
+                  }
+              }}
+             >
+               {goals.map((ele, index) => (
+                 <SwiperSlide key={index}>
+                   <div className="flex items-center justify-between gap-4 bg-white/10 p-4 rounded-lg">
+                     <div className="text-white">
+                       <h5 className="text-lg font-bold">{ele.name}</h5>
+                       <p className="lg:text-lg text-sm">عاااش عليك يعمم انا مبسوط منك</p>
+                     </div>
+           
+                     {ele.date && (
+                       <span className="text-white text-sm text-center bg-gray-800 p-1 rounded-sm">
+                         {ele.date}
+                       </span>
+                     )}
+                   </div>
+                 </SwiperSlide>
+               ))}
+             </Swiper>
+           )}
+            </div>
+          </div>
+
+          </div>
+
+
         </section>
         </>
     )

@@ -1,7 +1,7 @@
 "use client"
 import Clock from "@/components/Clock";
 import Customize from "@/components/Customize";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Colors{
   firstBG: string;
@@ -15,6 +15,14 @@ export default function Home() {
   lastBG: "#000",
   color: "#fff"
   })
+  useEffect(() => {
+      const color =  localStorage.getItem("color");
+
+      if (color) {
+        const currentColor = JSON.parse(color);
+        setColors(currentColor)
+      }
+  }, [])
   return (
     <main className="container mx-auto px-10 py-14">
        <h1 className="text-2xl bg-gray-600 text-center rounded-lg p-2 font-bold mb-4 text-white">You Clock Here Yammmm</h1>
