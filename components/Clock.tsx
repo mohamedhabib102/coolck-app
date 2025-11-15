@@ -27,6 +27,8 @@ interface Goals {
   date: string;
 }
 
+
+
 const Clock: React.FC<Colors> = ({firstBG, lastBG, color}) => {
     const [toggle, setToggle] = useState<boolean>(false);
     const [clock, setClock] = useState<Clock>({
@@ -125,12 +127,16 @@ const tick = () => {
       if (clockSave){
         const clockLocal = JSON.parse(clockSave);
         setClock(clockLocal.savedClock)
+        setInputText(clockLocal.name);
       }
 
       if (goals){
         const goalsUser =  JSON.parse(goals);
         setGoals(goalsUser)
       }
+
+
+
      }, [])
     return (
         <>
@@ -148,7 +154,15 @@ const tick = () => {
               type="text" 
               name="inputText"
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)} 
+              onChange={(e) => {
+                const savedName = localStorage.getItem("clock");
+                if (savedName) {
+                  const name =  JSON.parse(savedName)
+                  name.name = e.target.value;
+                  localStorage.setItem("clock", JSON.stringify(name))
+                } 
+                setInputText(e.target.value)
+              }} 
               placeholder="type name goal"
               onBlur={() => setTyping(!typing)}
               className="border border-white py-2 px-3 rounded-lg w-full mb-4
@@ -157,7 +171,7 @@ const tick = () => {
              ) : (
               <h2 
               onDoubleClick={() => setTyping(!typing)}
-              className="text-center text-3xl mb-4">{inputText || "Your Clock"}</h2>
+              className="text-center text-3xl mb-4">{inputText}</h2>
              )}
            
              <div className="flex items-center justify-center gap-4">
